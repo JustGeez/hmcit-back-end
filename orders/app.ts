@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
 /**
  *
@@ -29,7 +29,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
 
           rqstJSON = JSON.parse(event.body);
 
-          const id = uuidv4();
+          const id = nanoid();
 
           await ddb
             .put({
