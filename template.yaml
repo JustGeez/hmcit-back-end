@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  HMCT back-end
+
+  Serverless template for HMCT resources
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  #
+  # HTTP API
+  #
+  API:
+    Type: AWS::Serverless::HttpApi
+    CorsConfiguration:
+      AllowOrigins:
+        - "*"
+      AllowMethods:
+        - DELETE
+        - GET
+        - HEAD
+        - OPTIONS
+        - PATCH
+        - POST
+        - PUT
+      AllowHeaders:
+        - Content-Type
+        - Accept
+        - Access-Control-Allow-Headers
+        - Access-Control-Request-Method
+        - Access-Control-Request-Headers
+      MaxAge: 600
+      AllowCredentials: false
+
+  #
+  # LAMBDA FUNCTIONS
+  #
+  OrderFunc:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: orders/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        CreateOrder:
+          Type: HttpApi
+          Properties:
+            Path: /orders
+            Method: post
+        ReadOrders:
+          Type: HttpApi
+          Properties:
+            Path: /orders
+            Method: get
+        ReadOrder:
+          Type: HttpApi
+          Properties:
+            Path: /orders/{id}
+            Method: get
+        UpdateOrder:
+          Type: HttpApi
+          Properties:
+            Path: /orders/{id}
+            Method: put
+        DeleteOrder:
+          Type: HttpApi
+          Properties:
+            Path: /orders/{id}
+            Method: delete
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrderTable
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+  #
+  # DYNAMO DATABASE
+  #
+  OrderTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: OrderTable
+      Tags:
+        Department: Consumer
+        AppType: Serverless
+
+  #
+  # CLOUDFRONT
+  #
+  CloudFrontOriginAccessIdentity:
+    Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "Serverless website OA"
+
+  CloudfrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Comment: "Cloudfront distribution for serverless website"
+        DefaultRootObject: "index.html"
+        Enabled: true
+        HttpVersion: http2
+        # List of origins that Cloudfront will connect to
+        Origins:
+          - Id: s3-website
+            DomainName: !GetAtt S3Bucket.DomainName
+            S3OriginConfig:
+              # Restricting Bucket access through an origin access identity
+              OriginAccessIdentity:
+                Fn::Sub: "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+        # To connect the CDN to the origins you need to specify behaviours
+        DefaultCacheBehavior:
+          # Compress resources automatically ( gzip )
+          Compress: "true"
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: s3-website
+          ViewerProtocolPolicy: redirect-to-https
+
+  #
+  # S3 BUCKET
+  #
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Change bucket name to reflect your website
+      BucketName: hmcit
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        # Restricting access to cloudfront only.
+        Statement:
+          - Effect: Allow
+            Action: "s3:GetObject"
+            Resource:
+              - !Sub "arn:aws:s3:::${S3Bucket}/*"
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
