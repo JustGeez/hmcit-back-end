@@ -53,7 +53,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
                   focusAspect3: rqstJSON.answers.focusAspect3,
                   notes: rqstJSON.answers.notes,
                 },
-                status: 'IDLE', // IDLE, BUSY, COMPLETED, ERROR
+                status: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETED, ERROR
                 datePaid: '',
                 dateRefunded: '',
                 dateCompleted: '',
