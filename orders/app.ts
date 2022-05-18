@@ -23,11 +23,10 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
   try {
     switch (event.routeKey) {
       case 'POST /orders':
-        let rqstJSON;
         if (event.body) {
           console.log(...event.body);
 
-          rqstJSON = JSON.parse(event.body);
+          const rqstJSON = JSON.parse(event.body);
 
           const id = nanoid();
 
@@ -53,7 +52,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
                   focusAspect3: rqstJSON.answers.focusAspect3,
                   notes: rqstJSON.answers.notes,
                 },
-                status: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETED, ERROR
+                orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
                 datePaid: '',
                 dateRefunded: '',
                 dateCompleted: '',
@@ -84,44 +83,72 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         break;
 
       case 'PUT /orders/{id}':
-        if (event.pathParameters && event.body) {
-          rqstJSON = JSON.parse(event.body);
+        if (!event.body) break;
+        if (!event.pathParameters) break;
 
-          switch (rqstJSON.type) {
-            case 'pay':
-              await ddb
-                .update({
-                  TableName: 'OrderTable',
-                  Key: { id: event.pathParameters.id },
-                  UpdateExpression: 'SET datePaid =  :date',
-                  ExpressionAttributeValues: {
-                    ':date': `${new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' })}`,
-                  },
-                })
-                .promise();
+        const { type } = JSON.parse(event.body);
 
-              body = `PUT item ${event.pathParameters.id} payment status updated`;
-              break;
+        // HANDLE PAYMENT STATUS UPDATE
+        if (type == 'payment') {
+          await ddb
+            .update({
+              TableName: 'OrderTable',
+              Key: { id: event.pathParameters.id },
+              UpdateExpression: 'SET datePaid = :date',
+              ExpressionAttributeValues: {
+                ':date': `${new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' })}`,
+              },
+            })
+            .promise();
 
-            case 'completed':
-              await ddb
-                .update({
-                  TableName: 'OrderTable',
-                  Key: { id: event.pathParameters.id },
-                  UpdateExpression: 'SET dateCompleted =  :date, status = :completedStatus',
-                  ExpressionAttributeValues: {
-                    ':date': `${new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' })}`,
-                    ':completedStatus': 'COMPLETED',
-                  },
-                })
-                .promise();
-
-              body = `PUT item ${event.pathParameters.id} status updated to complete`;
-              break;
-            default:
-              throw new Error(`Unsupported put type: "${rqstJSON.type}"`);
-          }
+          body = `PUT item ${event.pathParameters.id} payment status updated`;
+          break;
         }
+
+        // HANDLE STATUS UPDATE
+        if (type == 'orderStatus') {
+          const { orderStatus } = JSON.parse(event.body);
+
+          if (
+            orderStatus !== 'COMPLETE' ||
+            orderStatus !== 'INCOMPLETE' ||
+            orderStatus !== 'ERROR' ||
+            orderStatus !== 'BUSY'
+          ) {
+            body = `Invalid order status ${orderStatus}`;
+            break;
+          }
+
+          if (orderStatus == 'COMPLETE') {
+            await ddb
+              .update({
+                TableName: 'OrderTable',
+                Key: { id: event.pathParameters.id },
+                UpdateExpression: 'SET orderStatus = :a, dateCompleted = :b',
+                ExpressionAttributeValues: {
+                  ':a': `${orderStatus}`,
+                  ':b': `${new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' })}`,
+                },
+              })
+              .promise();
+          } else {
+            await ddb
+              .update({
+                TableName: 'OrderTable',
+                Key: { id: event.pathParameters.id },
+                UpdateExpression: 'SET orderStatus = :a, dateCompleted = :b',
+                ExpressionAttributeValues: {
+                  ':a': `${orderStatus}`,
+                  ':b': '',
+                },
+              })
+              .promise();
+          }
+
+          body = `PUT item ${event.pathParameters.id} order status updated to ${orderStatus}`;
+          break;
+        }
+
         break;
 
       case 'DELETE /orders/{id}':
@@ -129,6 +156,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
           body = await ddb.delete({ TableName: 'OrderTable', Key: { id: event.pathParameters.id } }).promise();
         }
         break;
+
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`);
     }
