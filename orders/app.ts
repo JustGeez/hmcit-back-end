@@ -110,9 +110,9 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
           const { orderStatus } = JSON.parse(event.body);
 
           if (
-            orderStatus !== 'COMPLETE' ||
-            orderStatus !== 'INCOMPLETE' ||
-            orderStatus !== 'ERROR' ||
+            orderStatus !== 'COMPLETE' &&
+            orderStatus !== 'INCOMPLETE' &&
+            orderStatus !== 'ERROR' &&
             orderStatus !== 'BUSY'
           ) {
             body = `Invalid order status ${orderStatus}`;
@@ -155,6 +155,300 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         if (event.pathParameters) {
           body = await ddb.delete({ TableName: 'OrderTable', Key: { id: event.pathParameters.id } }).promise();
         }
+        break;
+
+      // TEST ROUTE ONLY
+      case 'GET /orders/populateDatabaseWithOrders':
+        await ddb
+          .batchWrite({
+            RequestItems: {
+              OrderTable: [
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'John',
+                      lastName: 'Matthews',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Kacy',
+                      lastName: 'Like',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Opel',
+                      lastName: 'Gert',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Macy',
+                      lastName: 'Khold',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Lark',
+                      lastName: 'Pops',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Mercy',
+                      lastName: 'Juw',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Mac',
+                      lastName: 'Killn',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Greg',
+                      lastName: 'hue',
+                      email: 'jmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Sophie',
+                      lastName: 'Thoma',
+                      email: 'sopa@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+                {
+                  PutRequest: {
+                    Item: {
+                      id: nanoid(),
+                      firstName: 'Mary',
+                      lastName: 'Matthews',
+                      email: 'mmat@mail.com',
+                      answers: {
+                        device: 'laptop',
+                        os: 'Windows',
+                        screen: '15.6"',
+                        touchScreen: 'No',
+                        uses: ['3D modeling', 'programming', 'heaving gaming'],
+                        location: 'At-home',
+                        storage: '512GB',
+                        budget: '15000',
+                        focusAspect1: 'Screen',
+                        focusAspect2: 'Keyboard',
+                        focusAspect3: 'Battery',
+                        notes: 'It must look cool',
+                      },
+                      orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
+                      datePaid: '17/02/2022',
+                      dateRefunded: '',
+                      dateCompleted: '',
+                    },
+                  },
+                },
+              ],
+            },
+          })
+          .promise();
+
+        body = 'Loaded database with dummy data';
         break;
 
       default:

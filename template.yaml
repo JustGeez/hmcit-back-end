@@ -73,6 +73,11 @@ Resources:
           Properties:
             Path: /orders/{id}
             Method: delete
+        LoadDummyData:
+          Type: HttpApi
+          Properties:
+            Path: /orders/populateDatabaseWithOrders
+            Method: get
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OrderTable
