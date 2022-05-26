@@ -90,13 +90,72 @@ Resources:
         EntryPoints:
           - app.ts
 
+  DevicesFunc:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: devices/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        CreateOrder:
+          Type: HttpApi
+          Properties:
+            Path: /devices
+            Method: post
+        ReadDevices:
+          Type: HttpApi
+          Properties:
+            Path: /devices
+            Method: get
+        ReadDevice:
+          Type: HttpApi
+          Properties:
+            Path: /devices/{id}
+            Method: get
+        UpdateDevice:
+          Type: HttpApi
+          Properties:
+            Path: /devices/{id}
+            Method: put
+        DeleteDevice:
+          Type: HttpApi
+          Properties:
+            Path: /devices/{id}
+            Method: delete
+        LoadDummyData:
+          Type: HttpApi
+          Properties:
+            Path: /devices/populateDatabaseWithTestData
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DeviceTable
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
   #
-  # DYNAMO DATABASE
+  # DYNAMO DATABASES
   #
   OrderTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: OrderTable
+      Tags:
+        Department: Consumer
+        AppType: Serverless
+
+  DeviceTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: DevicesTable
       Tags:
         Department: Consumer
         AppType: Serverless
