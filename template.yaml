@@ -99,7 +99,7 @@ Resources:
       Architectures:
         - arm64
       Events:
-        CreateOrder:
+        CreateDevice:
           Type: HttpApi
           Properties:
             Path: /devices
