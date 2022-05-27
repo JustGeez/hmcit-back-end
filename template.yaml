@@ -207,7 +207,7 @@ Resources:
         AppType: Serverless
 
   ReportsTable:
-    Type: AWS::Serverless:SimpleTable
+    Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: ReportsTable
       Tags:
