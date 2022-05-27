@@ -39,7 +39,7 @@ Resources:
   #
   # LAMBDA FUNCTIONS
   #
-  OrderFunc:
+  OrdersFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: orders/
@@ -80,7 +80,7 @@ Resources:
             Method: get
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref OrderTable
+            TableName: !Ref OrdersTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -90,7 +90,7 @@ Resources:
         EntryPoints:
           - app.ts
 
-  DevicesFunc:
+  DevicesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: devices/
@@ -131,7 +131,7 @@ Resources:
             Method: get
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref DeviceTable
+            TableName: !Ref DevicesTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -144,15 +144,15 @@ Resources:
   #
   # DYNAMO DATABASES
   #
-  OrderTable:
+  OrdersTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
-      TableName: OrderTable
+      TableName: OrdersTable
       Tags:
         Department: Consumer
         AppType: Serverless
 
-  DeviceTable:
+  DevicesTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: DevicesTable
@@ -209,7 +209,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       # Change bucket name to reflect your website
-      BucketName: hmcit
+      BucketName: hmct
 
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy

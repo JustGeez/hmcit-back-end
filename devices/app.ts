@@ -14,7 +14,9 @@ import { nanoid } from 'nanoid';
 
 const ddb = new AWS.DynamoDB.DocumentClient();
 
-export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+export const lambdaHandler = async (
+  event: APIGatewayProxyEventV2,
+): Promise<APIGatewayProxyResultV2> => {
   let response: APIGatewayProxyResultV2;
   let body;
 
@@ -28,8 +30,8 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
           console.log(rqstJSON);
 
           const id = nanoid();
-          console.log("Adding new device to database", id)
-          
+          console.log('Adding new device to database', id);
+
           await ddb
             .put({
               TableName: 'DevicesTable',
@@ -42,7 +44,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
                 thoughts: rqstJSON.thoughts,
                 offerUrl: rqstJSON.offerUrl,
                 techSpecs: rqstJSON.techSpecs, //TODO add method for child objects with better visibility
-                dateUpdated: new Date().toLocaleDateString('en-GB', {timeZone: "UTC"})
+                dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
               },
             })
             .promise();
@@ -58,7 +60,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         if (event.pathParameters) {
           body = await ddb
             .get({
-              TableName: 'DeviceTable',
+              TableName: 'DevicesTable',
               Key: { id: event.pathParameters.id },
             })
             .promise();
@@ -66,20 +68,20 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         break;
 
       case 'GET /devices':
-        body = await ddb.scan({ TableName: 'DeviceTable' }).promise();
+        body = await ddb.scan({ TableName: 'DevicesTable' }).promise();
         break;
 
       case 'PUT /devices/{id}':
         if (!event.body) break;
         if (!event.pathParameters) break;
 
-        const { type } = JSON.parse(event.body);
-
         break;
 
       case 'DELETE /devices/{id}':
         if (event.pathParameters) {
-          body = await ddb.delete({ TableName: 'DevicesTable', Key: { id: event.pathParameters.id } }).promise();
+          body = await ddb
+            .delete({ TableName: 'DevicesTable', Key: { id: event.pathParameters.id } })
+            .promise();
         }
         break;
 
@@ -93,29 +95,31 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
                   PutRequest: {
                     Item: {
                       id: nanoid(),
-                      name: "HP Spectre x360 14",
-                      retailer: "Incredible Connection",
+                      name: 'HP Spectre x360 14',
+                      retailer: 'Incredible Connection',
                       price: "R34'999.00",
-                      imgUrl: "https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/c/0/c07182636_6068.png",
+                      imgUrl:
+                        'https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/c/0/c07182636_6068.png',
                       thoughts:
-                        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!",
-                      offerUrl: "https://www.incredible.co.za/hp-spectre-x360-14-core-i7-1165g7-16gb-ram-1tb-ssd-storage-2-in-1-laptop",
+                        'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!',
+                      offerUrl:
+                        'https://www.incredible.co.za/hp-spectre-x360-14-core-i7-1165g7-16gb-ram-1tb-ssd-storage-2-in-1-laptop',
                       techSpecs: {
-                        os: "windows",
-                        screenSize: "14inch",
-                        touchScreen: "no",
-                        processor: "Core i7 1165G7",
-                        graphics: "Intel Iris Xe",
-                        ram: "16Gb DDR4 soldered",
-                        storage: "1TB SSD",
-                        batteryLife: "12 hours",
-                        color: "Silver",
-                        warranty: "3 years",
-                        build: "Aluminium",
-                        ports: ["usb-a x2", "usb-c thunderbolt 4 x1", "charger", "microSD"],
-                        uses: ["3d Modeling", "Heavy gaming", "Programming", "Office"],
+                        os: 'windows',
+                        screenSize: '14inch',
+                        touchScreen: 'no',
+                        processor: 'Core i7 1165G7',
+                        graphics: 'Intel Iris Xe',
+                        ram: '16Gb DDR4 soldered',
+                        storage: '1TB SSD',
+                        batteryLife: '12 hours',
+                        color: 'Silver',
+                        warranty: '3 years',
+                        build: 'Aluminium',
+                        ports: ['usb-a x2', 'usb-c thunderbolt 4 x1', 'charger', 'microSD'],
+                        uses: ['3d Modeling', 'Heavy gaming', 'Programming', 'Office'],
                       },
-                      dateUpdated: new Date().toLocaleDateString("en-GB", { timeZone: "UTC" }),
+                      dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
                     },
                   },
                 },
@@ -123,122 +127,130 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
                   PutRequest: {
                     Item: {
                       id: nanoid(),
-                      name: "Dell XPS 7390",
-                      retailer: "Incredible Connection",
+                      name: 'Dell XPS 7390',
+                      retailer: 'Incredible Connection',
                       price: "R32'999.00",
-                      imgUrl: "https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/d/e/dell_03_e9a8.jpg",
+                      imgUrl:
+                        'https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/d/e/dell_03_e9a8.jpg',
                       thoughts:
-                        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!",
-                      offerUrl: "https://www.incredible.co.za/dell-xps-7390-i7-1051u-16-512-fhd-laptop",
+                        'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!',
+                      offerUrl:
+                        'https://www.incredible.co.za/dell-xps-7390-i7-1051u-16-512-fhd-laptop',
                       techSpecs: {
-                        os: "windows",
-                        screenSize: "13.3inch",
-                        touchScreen: "yes",
-                        processor: "Core i7 10510U",
-                        graphics: "Intel Iris Xe",
-                        ram: "16Gb DDR3 soldered",
-                        storage: "512Gb NVME SSD",
-                        batteryLife: "15 hours",
-                        color: "Silver",
-                        warranty: "3 years",
-                        build: "Aluminium",
-                        ports: ["usb-a x2", "usb-c x1", "charger", "microSD"],
-                        uses: ["3d Modeling", "Heavy gaming", "Programming", "Office"],
+                        os: 'windows',
+                        screenSize: '13.3inch',
+                        touchScreen: 'yes',
+                        processor: 'Core i7 10510U',
+                        graphics: 'Intel Iris Xe',
+                        ram: '16Gb DDR3 soldered',
+                        storage: '512Gb NVME SSD',
+                        batteryLife: '15 hours',
+                        color: 'Silver',
+                        warranty: '3 years',
+                        build: 'Aluminium',
+                        ports: ['usb-a x2', 'usb-c x1', 'charger', 'microSD'],
+                        uses: ['3d Modeling', 'Heavy gaming', 'Programming', 'Office'],
                       },
-                      dateUpdated: new Date().toLocaleDateString("en-GB", { timeZone: "UTC" }),
+                      dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
                     },
-                  }
+                  },
                 },
                 {
                   PutRequest: {
                     Item: {
                       id: nanoid(),
-                      name: "Acer Nitro 5",
-                      retailer: "Incredible Connection",
+                      name: 'Acer Nitro 5',
+                      retailer: 'Incredible Connection',
                       price: "R32'999.00",
-                      imgUrl: "https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/n/i/nitro5_an515_45_bl1_rgb_bk_01a__1__cd4b.jpg",
+                      imgUrl:
+                        'https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/n/i/nitro5_an515_45_bl1_rgb_bk_01a__1__cd4b.jpg',
                       thoughts:
-                        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!",
-                      offerUrl: "https://www.incredible.co.za/acer-nitro-5-ryzen-7-5800h-16gb-ram-1tb-ssd-geforce-rtx-3060-gaming-laptop",
+                        'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!',
+                      offerUrl:
+                        'https://www.incredible.co.za/acer-nitro-5-ryzen-7-5800h-16gb-ram-1tb-ssd-geforce-rtx-3060-gaming-laptop',
                       techSpecs: {
-                        os: "windows",
-                        screenSize: "15inch",
-                        touchScreen: "no",
-                        processor: "Ryzen 7 5800H",
-                        graphics: "RTX3060 6Gb",
-                        ram: "16Gb DDR4 soldered",
-                        storage: "1TB SSD",
-                        batteryLife: "4 hours",
-                        color: "Black",
-                        warranty: "3 years",
-                        build: "Plastic",
-                        ports: ["usb-a x2", "usb-c x1", "charger", "microSD"],
-                        uses: ["3d Modeling", "Heavy gaming", "Programming", "Office"],
+                        os: 'windows',
+                        screenSize: '15inch',
+                        touchScreen: 'no',
+                        processor: 'Ryzen 7 5800H',
+                        graphics: 'RTX3060 6Gb',
+                        ram: '16Gb DDR4 soldered',
+                        storage: '1TB SSD',
+                        batteryLife: '4 hours',
+                        color: 'Black',
+                        warranty: '3 years',
+                        build: 'Plastic',
+                        ports: ['usb-a x2', 'usb-c x1', 'charger', 'microSD'],
+                        uses: ['3d Modeling', 'Heavy gaming', 'Programming', 'Office'],
                       },
-                      dateUpdated: new Date().toLocaleDateString("en-GB", { timeZone: "UTC" }),
-                    }
-                  }
+                      dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
+                    },
+                  },
                 },
                 {
                   PutRequest: {
                     Item: {
                       id: nanoid(),
-                      name: "HP OMEN 16",
-                      retailer: "Incredible Connection",
+                      name: 'HP OMEN 16',
+                      retailer: 'Incredible Connection',
                       price: "R34'999.00",
-                      imgUrl: "https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/4/9/492y6ea_3_4766.jpg",
+                      imgUrl:
+                        'https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/4/9/492y6ea_3_4766.jpg',
                       thoughts:
-                        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!",
-                      offerUrl: "https://www.incredible.co.za/hp-omen-ryzen-7-5800h-16gb-ram-1tb-ssd-storage-rtx-3070-gaming-laptop",
+                        'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!',
+                      offerUrl:
+                        'https://www.incredible.co.za/hp-omen-ryzen-7-5800h-16gb-ram-1tb-ssd-storage-rtx-3070-gaming-laptop',
                       techSpecs: {
-                        os: "windows",
-                        screenSize: "16inch", //TODO: Add refresh rate spec
-                        touchScreen: "no",
-                        processor: "Ryzen 7 5800H",
-                        graphics: "RTX3070 8Gb",
-                        ram: "16Gb DDR4 soldered",
-                        storage: "1TB SSD",
-                        batteryLife: "4 hours",
-                        color: "Black",
-                        warranty: "3 years",
-                        build: "Plastic",
-                        ports: ["usb-a x2", "usb-c x1", "charger", "microSD"],
-                        uses: ["3d Modeling", "Heavy gaming", "Programming", "Office"],
+                        os: 'windows',
+                        screenSize: '16inch', //TODO: Add refresh rate spec
+                        touchScreen: 'no',
+                        processor: 'Ryzen 7 5800H',
+                        graphics: 'RTX3070 8Gb',
+                        ram: '16Gb DDR4 soldered',
+                        storage: '1TB SSD',
+                        batteryLife: '4 hours',
+                        color: 'Black',
+                        warranty: '3 years',
+                        build: 'Plastic',
+                        ports: ['usb-a x2', 'usb-c x1', 'charger', 'microSD'],
+                        uses: ['3d Modeling', 'Heavy gaming', 'Programming', 'Office'],
                       },
-                      dateUpdated: new Date().toLocaleDateString("en-GB", { timeZone: "UTC" }),
-                    }
-                  }
+                      dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
+                    },
+                  },
                 },
                 {
                   PutRequest: {
                     Item: {
                       id: nanoid(),
-                      name: "Apple Macbook Pro M1",
-                      retailer: "Incredible Connection",
+                      name: 'Apple Macbook Pro M1',
+                      retailer: 'Incredible Connection',
                       price: "R33'999.00",
-                      imgUrl: "https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/1/0/10230767_inc_94c8.jpg",
+                      imgUrl:
+                        'https://www.incredible.co.za/media/catalog/product/cache/7ce9addd40d23ee411c2cc726ad5e7ed/1/0/10230767_inc_94c8.jpg',
                       thoughts:
-                        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!",
-                      offerUrl: "https://www.incredible.co.za/apple-macbook-pro-13-inch-m1-chip-8-core-gpu-16gb-512gb-ssd-space-grey",
+                        'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad maxime harum perspiciatis nisi? Rem quia obcaecati voluptatum nostrum reprehenderit dolor voluptates sunt quidem ipsam natus quam, adipisci autem quibusdam! Exercitationem!',
+                      offerUrl:
+                        'https://www.incredible.co.za/apple-macbook-pro-13-inch-m1-chip-8-core-gpu-16gb-512gb-ssd-space-grey',
                       techSpecs: {
-                        os: "MacOS",
-                        screenSize: "13.3Inch",
-                        touchScreen: "no",
-                        processor: "Apple M1",
-                        graphics: "M1 8-core GPU",
-                        ram: "16Gb DDR4 soldered",
-                        storage: "512GB SSD",
-                        batteryLife: "18 hours",
-                        color: "Space Grey",
-                        warranty: "3 years",
-                        build: "Aluminium",
-                        ports: ["usb-c thunderbolt 4 x2"],
-                        uses: ["3d Modeling", "Programming", "Office", "Movies", "Video editing"],
+                        os: 'MacOS',
+                        screenSize: '13.3Inch',
+                        touchScreen: 'no',
+                        processor: 'Apple M1',
+                        graphics: 'M1 8-core GPU',
+                        ram: '16Gb DDR4 soldered',
+                        storage: '512GB SSD',
+                        batteryLife: '18 hours',
+                        color: 'Space Grey',
+                        warranty: '3 years',
+                        build: 'Aluminium',
+                        ports: ['usb-c thunderbolt 4 x2'],
+                        uses: ['3d Modeling', 'Programming', 'Office', 'Movies', 'Video editing'],
                       },
-                      dateUpdated: new Date().toLocaleDateString("en-GB", { timeZone: "UTC" }),
-                    }
-                  }
-                }
+                      dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
+                    },
+                  },
+                },
               ],
             },
           })
@@ -253,12 +265,22 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
 
     response = {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': '*', // Allow from anywhere
+        'Access-Control-Allow-Methods': 'GET', // Allow only GET request
+      },
       body: JSON.stringify(body),
     };
   } catch (err) {
     console.log(err);
     response = {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': '*', // Allow from anywhere
+        'Access-Control-Allow-Methods': 'GET', // Allow only GET request
+      },
       body: JSON.stringify({
         message: 'some error happened',
       }),

@@ -14,7 +14,9 @@ import { nanoid } from 'nanoid';
 
 const ddb = new AWS.DynamoDB.DocumentClient();
 
-export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+export const lambdaHandler = async (
+  event: APIGatewayProxyEventV2,
+): Promise<APIGatewayProxyResultV2> => {
   let response: APIGatewayProxyResultV2;
   let body;
 
@@ -32,7 +34,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
 
           await ddb
             .put({
-              TableName: 'OrderTable',
+              TableName: 'OrdersTable',
               Item: {
                 id,
                 firstName: rqstJSON.firstName,
@@ -71,7 +73,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         if (event.pathParameters) {
           body = await ddb
             .get({
-              TableName: 'OrderTable',
+              TableName: 'OrdersTable',
               Key: { id: event.pathParameters.id },
             })
             .promise();
@@ -79,7 +81,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         break;
 
       case 'GET /orders':
-        body = await ddb.scan({ TableName: 'OrderTable' }).promise();
+        body = await ddb.scan({ TableName: 'OrdersTable' }).promise();
         break;
 
       case 'PUT /orders/{id}':
@@ -92,7 +94,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         if (type == 'payment') {
           await ddb
             .update({
-              TableName: 'OrderTable',
+              TableName: 'OrdersTable',
               Key: { id: event.pathParameters.id },
               UpdateExpression: 'SET datePaid = :date',
               ExpressionAttributeValues: {
@@ -122,7 +124,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
           if (orderStatus == 'COMPLETE') {
             await ddb
               .update({
-                TableName: 'OrderTable',
+                TableName: 'OrdersTable',
                 Key: { id: event.pathParameters.id },
                 UpdateExpression: 'SET orderStatus = :a, dateCompleted = :b',
                 ExpressionAttributeValues: {
@@ -134,7 +136,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
           } else {
             await ddb
               .update({
-                TableName: 'OrderTable',
+                TableName: 'OrdersTable',
                 Key: { id: event.pathParameters.id },
                 UpdateExpression: 'SET orderStatus = :a, dateCompleted = :b',
                 ExpressionAttributeValues: {
@@ -153,7 +155,9 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
 
       case 'DELETE /orders/{id}':
         if (event.pathParameters) {
-          body = await ddb.delete({ TableName: 'OrderTable', Key: { id: event.pathParameters.id } }).promise();
+          body = await ddb
+            .delete({ TableName: 'OrdersTable', Key: { id: event.pathParameters.id } })
+            .promise();
         }
         break;
 
@@ -162,7 +166,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
         await ddb
           .batchWrite({
             RequestItems: {
-              OrderTable: [
+              OrdersTable: [
                 {
                   PutRequest: {
                     Item: {
@@ -457,12 +461,22 @@ export const lambdaHandler = async (event: APIGatewayProxyEventV2): Promise<APIG
 
     response = {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': '*', // Allow from anywhere
+        'Access-Control-Allow-Methods': 'GET', // Allow only GET request
+      },
       body: JSON.stringify(body),
     };
   } catch (err) {
     console.log(err);
     response = {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': '*', // Allow from anywhere
+        'Access-Control-Allow-Methods': 'GET, PUT, POST', // Allow only GET request
+      },
       body: JSON.stringify({
         message: 'some error happened',
       }),
