@@ -141,6 +141,52 @@ Resources:
         EntryPoints:
           - app.ts
 
+  ReportsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: reports/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        CreateReport:
+          Type: HttpApi
+          Properties:
+            Path: /reports
+            Method: post
+        ReadReports:
+          Type: HttpApi
+          Properties:
+            Path: /reports
+            Method: get
+        ReadReport:
+          Type: HttpApi
+          Properties:
+            Path: /reports/{id}
+            Method: get
+        UpdateReport:
+          Type: HttpApi
+          Properties:
+            Path: /reports/{id}
+            Method: put
+        DeleteReport:
+          Type: HttpApi
+          Properties:
+            Path: /reports/{id}
+            Method: delete
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReportsTable
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
   #
   # DYNAMO DATABASES
   #
@@ -156,6 +202,14 @@ Resources:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: DevicesTable
+      Tags:
+        Department: Consumer
+        AppType: Serverless
+
+  ReportsTable:
+    Type: AWS::Serverless:SimpleTable
+    Properties:
+      TableName: ReportsTable
       Tags:
         Department: Consumer
         AppType: Serverless
