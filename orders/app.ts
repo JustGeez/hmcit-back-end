@@ -28,7 +28,7 @@ export const lambdaHandler = async (
         if (event.body) {
           console.log(...event.body);
 
-          const rqstJSON = JSON.parse(event.body);
+          const { firstName, lastName, email, answers } = JSON.parse(event.body);
 
           const id = nanoid();
 
@@ -37,22 +37,22 @@ export const lambdaHandler = async (
               TableName: 'OrdersTable',
               Item: {
                 id,
-                firstName: rqstJSON.firstName,
-                lastName: rqstJSON.lastName,
-                email: rqstJSON.email,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
                 answers: {
-                  device: rqstJSON.answers.device,
-                  os: rqstJSON.answers.os,
-                  screen: rqstJSON.answers.screen,
-                  touchScreen: rqstJSON.answers.touchScreen,
-                  uses: rqstJSON.answers.uses,
-                  location: rqstJSON.answers.location,
-                  storage: rqstJSON.answers.storage,
-                  budget: rqstJSON.answers.budget,
-                  focusAspect1: rqstJSON.answers.focusAspect1,
-                  focusAspect2: rqstJSON.answers.focusAspect2,
-                  focusAspect3: rqstJSON.answers.focusAspect3,
-                  notes: rqstJSON.answers.notes,
+                  device: answers.device,
+                  os: answers.os,
+                  screen: answers.screen,
+                  touchScreen: answers.touchScreen,
+                  uses: answers.uses,
+                  location: answers.location,
+                  storage: answers.storage,
+                  budget: answers.budget,
+                  focusAspect1: answers.focusAspect1,
+                  focusAspect2: answers.focusAspect2,
+                  focusAspect3: answers.focusAspect3,
+                  notes: answers.notes,
                 },
                 orderStatus: 'INCOMPLETE', // INCOMPLETE, BUSY, COMPLETE, ERROR
                 datePaid: '',

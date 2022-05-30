@@ -26,8 +26,9 @@ export const lambdaHandler = async (
     switch (event.routeKey) {
       case 'POST /devices':
         if (event.body) {
-          const rqstJSON = JSON.parse(event.body);
-          console.log(rqstJSON);
+          const { name, retailer, price, imgUrl, thoughts, offerUrl, techSpecs } = JSON.parse(
+            event.body,
+          );
 
           const id = nanoid();
           console.log('Adding new device to database', id);
@@ -37,13 +38,13 @@ export const lambdaHandler = async (
               TableName: 'DevicesTable',
               Item: {
                 id,
-                name: rqstJSON.name,
-                retailer: rqstJSON.retailer,
-                price: rqstJSON.price,
-                imgUrl: rqstJSON.imgUrl,
-                thoughts: rqstJSON.thoughts,
-                offerUrl: rqstJSON.offerUrl,
-                techSpecs: rqstJSON.techSpecs, //TODO add method for child objects with better visibility
+                name: name,
+                retailer: retailer,
+                price: price,
+                imgUrl: imgUrl,
+                thoughts: thoughts,
+                offerUrl: offerUrl,
+                techSpecs: techSpecs, //TODO add method for child objects with better visibility
                 dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
               },
             })

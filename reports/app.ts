@@ -25,24 +25,24 @@ export const lambdaHandler = async (
     switch (event.routeKey) {
       case 'POST /reports':
         if (event.body) {
-          const rqstJSON = JSON.parse(event.body);
+          const { id, deviceRank1, deviceRank2, deviceRank3 } = JSON.parse(event.body);
 
           await ddb
             .put({
               TableName: 'ReportsTable',
               Item: {
-                id: rqstJSON.id,
+                id,
                 dateUpdated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
-                deviceRank1Id: rqstJSON.deviceRank1Id,
-                deviceRank2Id: rqstJSON.deviceRank2Id,
-                deviceRank3Id: rqstJSON.deviceRank3Id,
+                deviceRank1,
+                deviceRank2,
+                deviceRank3,
               },
             })
             .promise();
 
           body = {
-            message: `Added new report for order ${rqstJSON.id} to DB`,
-            id: rqstJSON.id,
+            message: `Added new report for order ${id} to DB`,
+            id,
           };
         }
         break;
