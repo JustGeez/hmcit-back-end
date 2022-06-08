@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_WELCOME",
+    "SubjectPart": "Hey there, {{name}}!",
+    "HtmlPart": "<h1>Hello {{name}},</h1><p>We can't wait to present you with a simple, understandable list of devices perfectly suited for your needs.</p><br /><p>Our human tech gurus will spend the next little while researching devices which will fit your needs. We will get back to you within the next 24-48hrs.</p><br /><p>We are happy you chose to use our service and we will try our best to impress you.</p><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "Hello {{name}},\r\nWe can't wait to present you with a simple, understandable list of devices perfectly suited for your needs.\r\nOur human tech gurus will spend the next little while researching devices which will fit your needs. We will get back to you within the next 24-48hrs.\r\nWe are happy you chose to use our service and we will try our best to impress you.\r\nBest regards,\r\nHMCTECH team"
+  }
+}
