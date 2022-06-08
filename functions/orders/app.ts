@@ -58,6 +58,7 @@ export const lambdaHandler = async (
                 datePaid: '',
                 dateRefunded: '',
                 dateCompleted: '',
+                dateCreated: new Date().toLocaleDateString('en-GB', {timeZone: "UTC"})
               },
             })
             .promise();
@@ -162,7 +163,7 @@ export const lambdaHandler = async (
         break;
 
       // TEST ROUTE ONLY
-      case 'GET /orders/populateDatabaseWithOrders':
+      case 'GET /orders/populateDatabaseWithTestData':
         await ddb
           .batchWrite({
             RequestItems: {
@@ -192,6 +193,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -220,6 +222,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -248,6 +251,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -276,6 +280,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -304,6 +309,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -332,6 +338,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -360,6 +367,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -388,6 +396,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -416,6 +425,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },
@@ -444,6 +454,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
+                      dateCreated: "15/02/2022"
                     },
                   },
                 },

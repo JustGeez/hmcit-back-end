@@ -1,4 +1,4 @@
-import { Callback, DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
+import { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
 import AWS from 'aws-sdk';
 
 /**

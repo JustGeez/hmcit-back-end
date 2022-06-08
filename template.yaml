@@ -76,7 +76,7 @@ Resources:
         LoadDummyData:
           Type: HttpApi
           Properties:
-            Path: /orders/populateDatabaseWithOrders
+            Path: /orders/populateDatabaseWithTestData
             Method: get
       Policies:
         - DynamoDBCrudPolicy:
