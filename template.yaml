@@ -201,6 +201,8 @@ Resources:
           Properties:
             Path: /emails/sendWelcomeEmail
             Method: post
+      Policies:
+        - AmazonSESFullAccess
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
