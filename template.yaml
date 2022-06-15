@@ -208,8 +208,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             BatchSize: 100
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref OrdersTable
+        - AmazonSESFullAccess
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
