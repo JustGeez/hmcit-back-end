@@ -1,67 +1,51 @@
-import { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
-import AWS from 'aws-sdk';
+'use strict';
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
- */
-console.log('Loading function');
+import { APIGatewayProxyCallbackV2, Context, DynamoDBStreamEvent } from 'aws-lambda';
+import { AWSError } from 'aws-sdk';
 
-const ddbConverter = AWS.DynamoDB.Converter;
+var AWS = require('aws-sdk');
+var ses = new AWS.SES();
 
-export const lambdaHandler = async (event: DynamoDBStreamEvent) => {
-  console.log(JSON.stringify(event, null, 2));
-  event.Records.forEach((record: DynamoDBRecord) => {
+export const lambdaHandler = (
+  event: DynamoDBStreamEvent,
+  context: Context,
+  callback: APIGatewayProxyCallbackV2,
+) => {
+  // Loop through records in stream
+  event.Records.forEach((record) => {
+    console.log('Stream record: ', JSON.stringify(record, null, 2));
+
+    // If no new image, do nothing
+    if (!record.dynamodb?.NewImage) return;
+
     switch (record.eventName) {
       case 'INSERT':
-        if (!record.dynamodb?.NewImage) return;
+        // const name = `${record.dynamodb.NewImage.firstName.S} ${record.dynamodb.NewImage.lastName.S}`;
+        const orderId = record.dynamodb.NewImage.id.S;
+        const email = record.dynamodb.NewImage.email.S;
+        const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
 
-        // NEW ORDER ADDED
-        console.log('INSERT', record.eventID);
-        console.log('Added new record: %j', record.dynamodb?.NewImage);
-        console.log('SENDING WELCOME EMAIL');
-        break;
+        const params = {
+          Source: process.env.sourceEmail,
+          Destination: {
+            ToAddresses: [email],
+          },
+          ReplyToAddresses: [process.env.sourceEmail],
+          Template: 'HMCTECH_CONFIRM_ORDER',
+          TemplateData: `{\"orderId\":\"${orderId}\", \"orderUrl\":\"${orderUrl}\"}`,
+        };
 
-      case 'MODIFY':
-        if (!record.dynamodb?.NewImage) return;
-
-        const orderEntry = ddbConverter.unmarshall(record.dynamodb.NewImage);
-
-        console.log(
-          'Modified record. NEW: %j, OLD: %j',
-          record.dynamodb?.NewImage,
-          record.dynamodb?.OldImage,
-        );
-
-        // ORDER COMPLETED: send link and report
-        // Order will always be completed only after payment,
-        // so we put it first here as a blocker
-        if (orderEntry.dateCompleted !== '') {
-          console.log('SENDING REPORT EMAIL');
-          break;
-        }
-
-        // PAYMENT MADE: send invoice & confirmation
-        if (orderEntry.datePaid !== '') {
-          console.log('SENDING INVOICE & PAYMENT CONFIRMATION EMAIL');
-          break;
-        }
+        ses.sendTemplatedEmail(params, function (err: AWSError, data: string) {
+          if (err) {
+            console.error('Unable to send message. Error JSON:', JSON.stringify(err, null, 2));
+          } else {
+            console.log('Results from sending message: ', JSON.stringify(data, null, 2));
+          }
+        });
 
         break;
-
-      case 'REMOVE':
-        console.log('REMOVE', record.eventID);
-        console.log('Removed record: %j', record.dynamodb?.OldImage);
-        break;
-
-      default:
-        console.error('Invalid Event Name!');
     }
   });
-  // callback(undefined, 'message');
+
+  callback(null, `Successfully processed ${event.Records.length} records.`);
 };
