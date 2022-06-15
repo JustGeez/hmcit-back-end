@@ -2,9 +2,10 @@
 
 import { APIGatewayProxyCallbackV2, Context, DynamoDBStreamEvent } from 'aws-lambda';
 import { AWSError } from 'aws-sdk';
+import AWS from 'aws-sdk';
+import { SendTemplatedEmailResponse } from 'aws-sdk/clients/ses';
 
-var AWS = require('aws-sdk');
-var ses = new AWS.SES();
+const ses = new AWS.SES();
 
 export const lambdaHandler = (
   event: DynamoDBStreamEvent,
@@ -21,21 +22,22 @@ export const lambdaHandler = (
     switch (record.eventName) {
       case 'INSERT':
         // const name = `${record.dynamodb.NewImage.firstName.S} ${record.dynamodb.NewImage.lastName.S}`;
-        const orderId = record.dynamodb.NewImage.id.S;
-        const email = record.dynamodb.NewImage.email.S;
+        const orderId = record.dynamodb.NewImage.id.S || '';
+        const toEmail = record.dynamodb.NewImage.email.S || '';
         const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
+        const srcEmail = process.env.sourceEmail || '';
 
         const params = {
-          Source: process.env.sourceEmail,
+          Source: srcEmail,
           Destination: {
-            ToAddresses: [email],
+            ToAddresses: [toEmail],
           },
-          ReplyToAddresses: [process.env.sourceEmail],
+          ReplyToAddresses: [srcEmail],
           Template: 'HMCTECH_CONFIRM_ORDER',
           TemplateData: `{\"orderId\":\"${orderId}\", \"orderUrl\":\"${orderUrl}\"}`,
         };
 
-        ses.sendTemplatedEmail(params, function (err: AWSError, data: string) {
+        ses.sendTemplatedEmail(params, (err: AWSError, data: SendTemplatedEmailResponse) => {
           if (err) {
             console.error('Unable to send message. Error JSON:', JSON.stringify(err, null, 2));
           } else {
