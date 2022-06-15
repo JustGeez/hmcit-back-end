@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_CONFIRM_ORDER",
+    "SubjectPart": "HMCTECH Order {{orderId}}",
+    "HtmlPart": "<h1>Confirmation of Order {{orderId}}</h1><br /><p>Your order has been confirmed</p><br /><p>Click on the following link to view your order</p><a href={{orderUrl}} /><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "Confirmation of Order {{orderId}}\r\nYour order has been confirmed\r\nClick on the following link to view your order\r{{orderUrl}}\r\nBest regards,\r\nHMCTECH team"
+  }
+}
