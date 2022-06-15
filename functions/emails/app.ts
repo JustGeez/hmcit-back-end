@@ -1,19 +1,10 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import AWS, { AWSError } from 'aws-sdk';
-import { SendTemplatedEmailResponse } from 'aws-sdk/clients/ses';
+import { SESClient, SendTemplatedEmailCommand } from '@aws-sdk/client-ses';
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
- */
+console.log('Email function executing!');
 
 // email sdk
-const ses = new AWS.SES();
+const sesClient = new SESClient({ region: 'eu-west-1' });
 
 export const lambdaHandler = async (
   event: APIGatewayProxyEventV2,
@@ -21,15 +12,18 @@ export const lambdaHandler = async (
   let response: APIGatewayProxyResultV2;
   let body;
 
-  console.log('Email function executing!');
-
   try {
     switch (event.routeKey) {
       case 'POST /emails/sendWelcomeEmail':
         if (!event.body) break;
 
         const { firstName, lastName, email } = JSON.parse(event.body);
-        const srcEmail = process.env.sourceEmail || '';
+        const srcEmail = process.env.sourceEmail;
+
+        if (srcEmail == undefined) {
+          console.error('Missing source email environment variable!');
+          break;
+        }
 
         // email params
         const params = {
@@ -43,16 +37,12 @@ export const lambdaHandler = async (
         };
 
         // call sdk
-        ses.sendTemplatedEmail(params, (err: AWSError, data: SendTemplatedEmailResponse) => {
-          if (err) {
-            console.error('Unable to send message. Error JSON:', JSON.stringify(err, null, 2));
-          } else {
-            console.log('Results from sending message: ', JSON.stringify(data, null, 2));
-          }
-        });
+        const data = await sesClient.send(new SendTemplatedEmailCommand(params));
+        console.log('The email has been sent');
 
         body = {
           message: `Welcome email requested from SES`,
+          data,
         };
 
         break;

@@ -201,6 +201,9 @@ Resources:
           Properties:
             Path: /emails/sendWelcomeEmail
             Method: post
+      Environment:
+        Variables:
+          sourceEmail: jman.12.93@gmail.com
       Policies:
         - AmazonSESFullAccess
     Metadata: # Manage esbuild properties
