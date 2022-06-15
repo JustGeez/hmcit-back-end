@@ -44,7 +44,7 @@ Resources:
     Properties:
       CodeUri: functions/orders/
       Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Architectures:
         - arm64
       Events:
@@ -95,7 +95,7 @@ Resources:
     Properties:
       CodeUri: functions/devices/
       Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Architectures:
         - arm64
       Events:
@@ -146,7 +146,7 @@ Resources:
     Properties:
       CodeUri: functions/reports/
       Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Architectures:
         - arm64
       Events:
@@ -187,12 +187,35 @@ Resources:
         EntryPoints:
           - app.ts
 
+  EmailsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: functions/emails/
+      Handler: app.lambdaHandler
+      Runtime: nodejs16.x
+      Architectures:
+        - arm64
+      Events:
+        sendWelcomeEmail:
+          Type: HttpApi
+          Properties:
+            Path: /emails/sendWelcomeEmail
+            Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
   ProcOrdersStream:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: functions/procOrdersDbStream/
       Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
       Description: DynamoDB trigger to handle streams from order table
       Timeout: 3
       Architectures:
