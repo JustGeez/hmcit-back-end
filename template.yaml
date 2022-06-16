@@ -269,7 +269,7 @@ Resources:
       #   - Department: Consumer
       #   - AppType: Serverless
       StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGE
+        StreamViewType: NEW_AND_OLD_IMAGES
 
   DevicesTable:
     Type: AWS::DynamoDB::Table
