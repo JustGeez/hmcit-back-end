@@ -44,7 +44,7 @@ Resources:
     Properties:
       CodeUri: functions/orders/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs14.x
       Architectures:
         - arm64
       Events:
@@ -95,7 +95,7 @@ Resources:
     Properties:
       CodeUri: functions/devices/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs14.x
       Architectures:
         - arm64
       Events:
@@ -146,7 +146,7 @@ Resources:
     Properties:
       CodeUri: functions/reports/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs14.x
       Architectures:
         - arm64
       Events:
@@ -222,7 +222,6 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs16.x
       Description: DynamoDB trigger to handle streams from order table
-      Timeout: 3
       Architectures:
         - arm64
       Events:
@@ -235,6 +234,9 @@ Resources:
                 - StreamArn
             StartingPosition: TRIM_HORIZON
             BatchSize: 100
+      Environment:
+        Variables:
+          sourceEmail: jman.12.93@gmail.com
       Policies:
         - AmazonSESFullAccess
     Metadata: # Manage esbuild properties
