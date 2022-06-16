@@ -35,8 +35,10 @@ export const lambdaHandler = async (
         const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
 
         if (email == undefined || orderId == undefined || srcEmail == undefined) {
-          console.error('Email or orderId or srcEmail var undefined!');
-          callback('Failed to process email send request!');
+          if (email == undefined) console.error('INSERT: Email var undefined');
+          if (orderId == undefined) console.error('INSERT: orderId var undefined');
+          if (srcEmail == undefined) console.error('INSERT: srcEmail var undefined');
+          callback('INSERT: Failed to process email send request!');
           return;
         }
 
@@ -47,14 +49,17 @@ export const lambdaHandler = async (
           },
           ReplyToAddresses: [srcEmail],
           Template: 'HMCTECH_CONFIRM_ORDER',
-          TemplateData: `{\"orderId\":\"${orderId}\", \"orderUrl\":\"${orderUrl}\"}`,
+          TemplateData: JSON.stringify({
+            orderId: orderId,
+            orderUrl: orderUrl,
+          }),
         };
 
         try {
           const data = await sesClient.send(new SendTemplatedEmailCommand(params));
-          console.log('SUCCESS', data);
+          console.log('SUCCESS: order confirmation', data);
         } catch (error) {
-          console.error('ERROR', error);
+          console.error('ERROR: order confirmation', error);
         }
 
         break;
@@ -76,8 +81,12 @@ export const lambdaHandler = async (
           firstName == undefined ||
           lastName == undefined
         ) {
-          console.error('Email or srcEmail var undefined!');
-          callback('Failed to process email send request!');
+          if (email == undefined) console.error('MODIFY: Email var undefined');
+          if (srcEmail == undefined) console.error('MODIFY: srcEmail var undefined');
+          if (firstName == undefined) console.error('MODIFY: firstName var undefined');
+          if (lastName == undefined) console.error('MODIFY: lastName var undefined');
+
+          callback('MODIFY: Failed to process email send request!');
           return;
         }
 
@@ -97,14 +106,18 @@ export const lambdaHandler = async (
             },
             ReplyToAddresses: [srcEmail],
             Template: 'HMCTECH_CONFIRM_PAYMENT',
-            TemplateData: `{"\name\":\"${firstName} ${lastName}\" \"orderId\":\"${orderId}\", \"invoiceUrl\":\"${invoiceUrl}\"}`,
+            TemplateData: JSON.stringify({
+              name: `${firstName} ${lastName}`,
+              orderId: orderId,
+              invoiceUrl: invoiceUrl,
+            }),
           };
 
           try {
             const data = await sesClient.send(new SendTemplatedEmailCommand(params));
-            console.log('SUCCESS', data);
+            console.log('SUCCESS: payment status', data);
           } catch (error) {
-            console.error('ERROR', error);
+            console.error('ERROR: payment status', error);
           }
         }
 
@@ -119,14 +132,18 @@ export const lambdaHandler = async (
             },
             ReplyToAddresses: [srcEmail],
             Template: 'HMCTECH_NOTIFY_REPORT_READY',
-            TemplateData: `{"\name\":\"${firstName} ${lastName}\" \"orderId\":\"${orderId}\", \"reportUrl\":\"${reportUrl}\"}`,
+            TemplateData: JSON.stringify({
+              name: `${firstName} ${lastName}`,
+              orderId: orderId,
+              reportUrl: reportUrl,
+            }),
           };
 
           try {
             const data = await sesClient.send(new SendTemplatedEmailCommand(params));
-            console.log('SUCCESS', data);
+            console.log('SUCCESS: report confirmation', data);
           } catch (error) {
-            console.error('ERROR', error);
+            console.error('ERROR: report confirmation', error);
           }
         }
         break;
