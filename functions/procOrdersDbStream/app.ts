@@ -81,13 +81,13 @@ export const lambdaHandler = async (
           return;
         }
 
-        const oldPaymentStatus = record.dynamodb.OldImage.paymentStatus.S; // Date string
-        const newPaymentStatus = record.dynamodb.NewImage.paymentStatus.S; // Date string
+        const oldDatePaid = record.dynamodb.OldImage.datePaid.S; // Date string
+        const newDatePaid = record.dynamodb.NewImage.datePaid.S; // Date string
         const oldOrderStatus = record.dynamodb.OldImage.orderStatus.S; // string
         const newOrderStatus = record.dynamodb.NewImage.orderStatus.S; // string
 
         // Check if payment status updated - old doesn't match new
-        if (oldPaymentStatus !== newPaymentStatus) {
+        if (oldDatePaid !== newDatePaid) {
           const invoiceUrl = `${process.env.websiteUrl}/invoices/${orderId}`;
 
           params = {
