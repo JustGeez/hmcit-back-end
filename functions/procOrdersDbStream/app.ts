@@ -1,49 +1,55 @@
 'use strict';
 
 import { APIGatewayProxyCallbackV2, Context, DynamoDBStreamEvent } from 'aws-lambda';
-import { AWSError } from 'aws-sdk';
-import AWS from 'aws-sdk';
-import { SendTemplatedEmailResponse } from 'aws-sdk/clients/ses';
+import { SESClient, SendTemplatedEmailCommand } from '@aws-sdk/client-ses';
 
-const ses = new AWS.SES();
+const sesClient = new SESClient({ region: 'eu-west-1' });
 
-export const lambdaHandler = (
+export const lambdaHandler = async (
   event: DynamoDBStreamEvent,
   context: Context,
   callback: APIGatewayProxyCallbackV2,
 ) => {
   // Loop through records in stream
-  event.Records.forEach((record) => {
+  event.Records.forEach(async (record) => {
     console.log('Stream record: ', JSON.stringify(record, null, 2));
 
     // If no new image, do nothing
-    if (!record.dynamodb?.NewImage) return;
+    if (record.dynamodb?.NewImage == undefined) {
+      console.error('No new image in event!');
+      return;
+    }
 
     switch (record.eventName) {
       case 'INSERT':
         // const name = `${record.dynamodb.NewImage.firstName.S} ${record.dynamodb.NewImage.lastName.S}`;
-        const orderId = record.dynamodb.NewImage.id.S || '';
-        const toEmail = record.dynamodb.NewImage.email.S || '';
+        const orderId = record.dynamodb.NewImage.id.S;
+        const email = record.dynamodb.NewImage.email.S;
         const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
-        const srcEmail = process.env.sourceEmail || '';
+        const srcEmail = process.env.sourceEmail;
+
+        if (email == undefined || orderId == undefined || srcEmail == undefined) {
+          console.error('Email or orderId or srcEmail var undefined!');
+          callback('Failed to process email send request!');
+          return;
+        }
 
         const params = {
           Source: srcEmail,
           Destination: {
-            ToAddresses: [toEmail],
+            ToAddresses: [email],
           },
           ReplyToAddresses: [srcEmail],
           Template: 'HMCTECH_CONFIRM_ORDER',
           TemplateData: `{\"orderId\":\"${orderId}\", \"orderUrl\":\"${orderUrl}\"}`,
         };
 
-        ses.sendTemplatedEmail(params, (err: AWSError, data: SendTemplatedEmailResponse) => {
-          if (err) {
-            console.error('Unable to send message. Error JSON:', JSON.stringify(err, null, 2));
-          } else {
-            console.log('Results from sending message: ', JSON.stringify(data, null, 2));
-          }
-        });
+        try {
+          const data = await sesClient.send(new SendTemplatedEmailCommand(params));
+          console.log('SUCCESS', data);
+        } catch (error) {
+          console.error('ERROR', error);
+        }
 
         break;
     }
