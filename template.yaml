@@ -237,6 +237,7 @@ Resources:
       Environment:
         Variables:
           sourceEmail: jman.12.93@gmail.com
+          websiteUrl: https://d1zlgl3x9ii1qx.cloudfront.net #TODO Change this to actual domain
       Policies:
         - AmazonSESFullAccess
     Metadata: # Manage esbuild properties
@@ -268,7 +269,7 @@ Resources:
       #   - Department: Consumer
       #   - AppType: Serverless
       StreamSpecification:
-        StreamViewType: NEW_IMAGE
+        StreamViewType: NEW_AND_OLD_IMAGE
 
   DevicesTable:
     Type: AWS::DynamoDB::Table
