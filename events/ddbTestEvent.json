@@ -9,7 +9,7 @@
       "dynamodb": {
         "Keys": {
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "NewImage": {
@@ -23,7 +23,7 @@
             "S": ""
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -35,7 +35,7 @@
             "S": "INCOMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "ApproximateCreationDateTime": 1428537600,
@@ -54,7 +54,7 @@
       "dynamodb": {
         "Keys": {
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "NewImage": {
@@ -68,7 +68,7 @@
             "S": "17/02/2022"
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -80,7 +80,7 @@
             "S": "INCOMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "OldImage": {
@@ -91,10 +91,10 @@
             "S": "30/05/2022"
           },
           "datePaid": {
-            "S": "17/02/2022"
+            "S": ""
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -106,7 +106,7 @@
             "S": "INCOMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "ApproximateCreationDateTime": 1428537600,
@@ -125,7 +125,7 @@
       "dynamodb": {
         "Keys": {
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "NewImage": {
@@ -139,7 +139,7 @@
             "S": "17/02/2022"
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -151,7 +151,7 @@
             "S": "COMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "OldImage": {
@@ -165,7 +165,7 @@
             "S": "17/02/2022"
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -177,7 +177,7 @@
             "S": "INCOMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "ApproximateCreationDateTime": 1428537600,
@@ -196,7 +196,7 @@
       "dynamodb": {
         "Keys": {
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "OldImage": {
@@ -210,7 +210,7 @@
             "S": "17/02/2022"
           },
           "email": {
-            "S": "jmat@mail.com"
+            "S": "<insert_email_here>"
           },
           "firstName": {
             "S": "Lark"
@@ -222,7 +222,7 @@
             "S": "COMPLETE"
           },
           "id": {
-            "N": "101"
+            "S": "101"
           }
         },
         "ApproximateCreationDateTime": 1428537600,
