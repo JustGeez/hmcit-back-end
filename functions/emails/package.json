@@ -7,9 +7,8 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "@types/uuid": "^8.3.4",
-    "aws-sdk": "^2.1120.0",
-    "nanoid": "^3.3.4"
+    "@aws-sdk/client-ses": "^3.110.0",
+    "aws-sdk": "^2.1120.0"
   },
   "scripts": {
     "unit": "jest",
