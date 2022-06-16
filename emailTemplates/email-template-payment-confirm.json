@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_CONFIRM_PAYMENT",
+    "SubjectPart": "HMCTECH Payment for order {{orderId}} received",
+    "HtmlPart": "<h1>Hi {{name}},</h1><br /><h2>We've received your payment for your order {{orderId}}</h2><br /><p>Now that we have the funds to pay our tech gurus, they can begin cracking away at finding the perfect devices for you!</p><br /><p>Click on the following link to view your invoice</p><a href={{invoiceUrl}}>{{invoiceUrl}}</a><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "Hi {{name}},\r\nWe've received your payment for your order {{orderId}}\r\nNow that we have the funds to pay our tech gurus, they can begin cracking away at finding the perfect devices for you!\r\nClick on the following link to view your invoice\r{{invoiceUrl}}\r\nBest regards,\r\nHMCTECH team"
+  }
+}

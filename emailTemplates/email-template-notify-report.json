@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_NOTIFY_REPORT_READY",
+    "SubjectPart": "HMCTECH Order {{orderId}} report ready :)",
+    "HtmlPart": "<h1>Hi {{name}},</h1><br /><h2>The report for order {{orderId}} is ready!</h2><br /><p>Your personalised tech report has been prepared for you and is ready to help you choose the right device :)</p><br /><p>Click on the following link to view your report</p><a href={{reportUrl}}>{{reportUrl}}</a><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "Hi {{name}},\r\nThe report for order {{orderId}} is ready!\r\nYour personalised tech report has been prepared for you and is ready to help you choose the right device :)\r\nClick on the following link to view your report\r{{reportUrl}}\r\nBest regards,\r\nHMCTECH team"
+  }
+}
