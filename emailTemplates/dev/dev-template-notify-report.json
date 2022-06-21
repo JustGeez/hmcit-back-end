@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_DEV_NOTIFY_REPORT",
+    "SubjectPart": "HMCTECH: Tech Report {{orderId}} is ready!",
+    "HtmlPart": "<h1 style='color: red'>DEVELOPMENT</h1><br /><h1>Greetings {{name}},</h1><p>Your report is ready</p><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "DEVELOPMENT\r\nGreetings {{name}},\r\nYour report is ready\r\nBest regards,\r\nHMCTECH team"
+  }
+}

@@ -31,13 +31,23 @@ export const lambdaHandler = async (
         }
 
         orderId = record.dynamodb.NewImage.id.S;
+        firstName = record.dynamodb.NewImage.firstName.S;
+        lastName = record.dynamodb.NewImage.lastName.S;
         email = record.dynamodb.NewImage.email.S;
-        const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
+        // const orderUrl = `${process.env.websiteUrl}/orders/${orderId}`;
 
-        if (email == undefined || orderId == undefined || srcEmail == undefined) {
+        if (
+          email == undefined ||
+          orderId == undefined ||
+          srcEmail == undefined ||
+          firstName == undefined ||
+          lastName == undefined
+        ) {
           if (email == undefined) console.error('INSERT: Email var undefined');
           if (orderId == undefined) console.error('INSERT: orderId var undefined');
           if (srcEmail == undefined) console.error('INSERT: srcEmail var undefined');
+          if (firstName == undefined) console.error('INSERT: firstName var undefined');
+          if (lastName == undefined) console.error('INSERT: lastName var undefined');
           callback('INSERT: Failed to process email send request!');
           return;
         }
@@ -48,10 +58,11 @@ export const lambdaHandler = async (
             ToAddresses: [email],
           },
           ReplyToAddresses: [srcEmail],
-          Template: 'HMCTECH_CONFIRM_ORDER',
+          Template: 'HMCTECH_DEV_CONFIRM_ORDER',
           TemplateData: JSON.stringify({
+            name: `${firstName} ${lastName}`,
             orderId: orderId,
-            orderUrl: orderUrl,
+            // orderUrl: orderUrl,
           }),
         };
 
@@ -71,6 +82,7 @@ export const lambdaHandler = async (
           return;
         }
 
+        orderId = record.dynamodb.NewImage.id.S;
         firstName = record.dynamodb.NewImage.firstName.S;
         lastName = record.dynamodb.NewImage.lastName.S;
         email = record.dynamodb.NewImage.email.S;
@@ -79,12 +91,14 @@ export const lambdaHandler = async (
           email == undefined ||
           srcEmail == undefined ||
           firstName == undefined ||
-          lastName == undefined
+          lastName == undefined ||
+          orderId == undefined
         ) {
           if (email == undefined) console.error('MODIFY: Email var undefined');
           if (srcEmail == undefined) console.error('MODIFY: srcEmail var undefined');
           if (firstName == undefined) console.error('MODIFY: firstName var undefined');
           if (lastName == undefined) console.error('MODIFY: lastName var undefined');
+          if (orderId == undefined) console.error('MODIFY: orderId var undefined');
 
           callback('MODIFY: Failed to process email send request!');
           return;
@@ -92,12 +106,12 @@ export const lambdaHandler = async (
 
         const oldDatePaid = record.dynamodb.OldImage.datePaid.S; // Date string
         const newDatePaid = record.dynamodb.NewImage.datePaid.S; // Date string
-        const oldOrderStatus = record.dynamodb.OldImage.orderStatus.S; // string
+        // const oldOrderStatus = record.dynamodb.OldImage.orderStatus.S; // string
         const newOrderStatus = record.dynamodb.NewImage.orderStatus.S; // string
 
         // Check if payment status updated - old doesn't match new
-        if (oldDatePaid !== newDatePaid) {
-          const invoiceUrl = `${process.env.websiteUrl}/invoices/${orderId}`;
+        if (newDatePaid !== oldDatePaid) {
+          // const invoiceUrl = `${process.env.websiteUrl}/invoices/${orderId}`;
 
           params = {
             Source: srcEmail,
@@ -105,11 +119,11 @@ export const lambdaHandler = async (
               ToAddresses: [email],
             },
             ReplyToAddresses: [srcEmail],
-            Template: 'HMCTECH_CONFIRM_PAYMENT',
+            Template: 'HMCTECH_DEV_CONFIRM_PAYMENT',
             TemplateData: JSON.stringify({
               name: `${firstName} ${lastName}`,
               orderId: orderId,
-              invoiceUrl: invoiceUrl,
+              // invoiceUrl: invoiceUrl,
             }),
           };
 
@@ -121,9 +135,9 @@ export const lambdaHandler = async (
           }
         }
 
-        // Check if order status updated - old doesn't match new
-        if (oldOrderStatus !== newOrderStatus) {
-          const reportUrl = `${process.env.websiteUrl}/reports/${orderId}`;
+        // Check if order status changed to COMPLETE
+        if (newOrderStatus == 'COMPLETE') {
+          // const reportUrl = `${process.env.websiteUrl}/reports/${orderId}`;
 
           params = {
             Source: srcEmail,
@@ -131,11 +145,11 @@ export const lambdaHandler = async (
               ToAddresses: [email],
             },
             ReplyToAddresses: [srcEmail],
-            Template: 'HMCTECH_NOTIFY_REPORT_READY',
+            Template: 'HMCTECH_DEV_NOTIFY_REPORT',
             TemplateData: JSON.stringify({
               name: `${firstName} ${lastName}`,
               orderId: orderId,
-              reportUrl: reportUrl,
+              // reportUrl: reportUrl,
             }),
           };
 

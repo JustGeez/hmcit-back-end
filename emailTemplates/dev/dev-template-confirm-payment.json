@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_DEV_CONFIRM_PAYMENT",
+    "SubjectPart": "HMCTECH: Order {{orderId}} invoice. Let's go!",
+    "HtmlPart": "<h1 style='color: red'>DEVELOPMENT</h1><br /><h1>Greetings {{name}},</h1><p>Please find the invoice for your order {{orderId}} attached</p><br /><p>Our human tech gurus are starting their quest to locate the perfect devices for you. Your moola will be used to fund our coffee-bill at the office</p><br /><p>We are excited you chose to use our service and we will try our best to impress you.</p><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "DEVELOPMENT\r\nGreetings {{name}},\r\nPlease find the invoice for your order {{orderId}} attached\r\nOur human tech gurus are starting their quest to locate the perfect devices for you. Your moola will be used to fund our coffee-bill at the office\r\nWe are excited you chose to use our service and we will try our best to impress you.\r\nBest regards,\r\nHMCTECH team"
+  }
+}

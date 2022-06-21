@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_DEV_CONFIRM_ORDER",
+    "SubjectPart": "HMCTECH: Order {{orderId}} received!",
+    "HtmlPart": "<h1 style='color: red'>DEVELOPMENT</h1><br /><h1>Greetings {{name}}</h1><p>Your order has been received.</p><p>We will only be able to begin processing your order once payment has been received.</p><br /><h3>Best regards,</h3><h3>HMCTECH team</h3>",
+    "TextPart": "DEVELOPMENT\r\nGreetings {{name}},\r\nYour order has been received.\r\nWe will only be able to begin processing your order once payment has been received.\r\nBest regards,\r\nHMCTECH team"
+  }
+}
