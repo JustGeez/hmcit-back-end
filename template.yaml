@@ -5,79 +5,221 @@ Description: >
 
   Serverless template for HMCT resources
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  AppName:
+    Type: String
+    Description: Name of the application
+  ClientDomains:
+    Type: CommaDelimitedList
+    Description: Array of domains allowed to use this UserPool
+  AdminEmail:
+    Type: String
+    Description: Email address for administrator
+  AddGroupsToScopes:
+    Type: String
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  UserPoolId:
+    Type: String
+    Description: User poolID for Cognito provider
+  Audience:
+    Type: String
+    Description: Client id for user pool
+
+Conditions:
+  ScopeGroups: !Equals [!Ref AddGroupsToScopes, "true"]
+
 Globals:
   Function:
     Timeout: 5
+    Handler: app.lambdaHandler
+    Runtime: nodejs14.x
+    Architectures:
+      - arm64
 
 Resources:
   #
+  # Cognito User Auth
+  #
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AppName}-UserPool
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Sub ${AppName}-UserPoolClient
+      GenerateSecret: false # set to false for web clients
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs: !Ref ClientDomains
+      LogoutURLs: !Ref ClientDomains
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - implicit #for testing with postman
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub ${AppName}-${AWS::AccountId}
+      UserPoolId: !Ref UserPool
+
+  AdminUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: Admins
+      Description: Admin user group
+      Precedence: 0
+      UserPoolId: !Ref UserPool
+
+  AdminUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: !Ref AdminEmail
+      DesiredDeliveryMediums:
+        - EMAIL
+      ForceAliasCreation: true
+      UserAttributes:
+        - Name: email
+          Value: !Ref AdminEmail
+      UserPoolId: !Ref UserPool
+
+  AddUserToGroup:
+    Type: AWS::Cognito::UserPoolUserToGroupAttachment
+    Properties:
+      GroupName: !Ref AdminUserGroup
+      Username: !Ref AdminUser
+      UserPoolId: !Ref UserPool
+
+  #
   # HTTP API
   #
-  API:
+  HttpApi:
     Type: AWS::Serverless::HttpApi
-    CorsConfiguration:
-      AllowOrigins:
-        - "*"
-      AllowMethods:
-        - DELETE
-        - GET
-        - HEAD
-        - OPTIONS
-        - PATCH
-        - POST
-        - PUT
-      AllowHeaders:
-        - Content-Type
-        - Accept
-        - Access-Control-Allow-Headers
-        - Access-Control-Request-Method
-        - Access-Control-Request-Headers
-      MaxAge: 600
-      AllowCredentials: false
+    Properties:
+      Auth:
+        Authorizers:
+          GeneralAuth:
+            AuthorizationScope:
+              - email
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPoolId}
+              audience:
+                - !Ref Audience
+      CorsConfiguration:
+        AllowOrigins:
+          - "http://localhost:3000"
+        AllowMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+        AllowHeaders:
+          - Content-Type
+          - Accept
+          - Access-Control-Allow-Headers
+          - Access-Control-Request-Method
+          - Access-Control-Request-Headers
+          - Authorization
+        MaxAge: 600
+        AllowCredentials: true
 
   #
   # LAMBDA FUNCTIONS
   #
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Condition: ScopeGroups
+    Properties:
+      CodeUri: functions/cognitoScope/
+      Events:
+        CognitoTrigger:
+          Type: Cognito
+          Properties:
+            Trigger: PreTokenGeneration
+            UserPool: !Ref UserPool
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
   OrdersFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/orders/
-      Handler: app.lambdaHandler
-      Runtime: nodejs14.x
-      Architectures:
-        - arm64
       Events:
         CreateOrder:
           Type: HttpApi
           Properties:
             Path: /orders
             Method: post
+            ApiId: !Ref HttpApi
         ReadOrders:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
             Path: /orders
             Method: get
+            ApiId: !Ref HttpApi
         ReadOrder:
           Type: HttpApi
           Properties:
             Path: /orders/{id}
             Method: get
+            ApiId: !Ref HttpApi
         UpdateOrder:
           Type: HttpApi
           Properties:
             Path: /orders/{id}
             Method: put
+            ApiId: !Ref HttpApi
         DeleteOrder:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
             Path: /orders/{id}
             Method: delete
+            ApiId: !Ref HttpApi
         LoadDummyData:
           Type: HttpApi
           Properties:
             Path: /orders/populateDatabaseWithTestData
             Method: get
+            ApiId: !Ref HttpApi
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OrdersTable
@@ -91,22 +233,28 @@ Resources:
           - app.ts
 
   DevicesFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/devices/
-      Handler: app.lambdaHandler
-      Runtime: nodejs14.x
-      Architectures:
-        - arm64
       Events:
         CreateDevice:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /devices
             Method: post
         ReadDevices:
           Type: HttpApi
           Properties:
+            # Auth:
+            #   Authorizer: GeneralAuth
+            #   AuthorizationScopes:
+            #     - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /devices
             Method: get
         ReadDevice:
@@ -114,14 +262,25 @@ Resources:
           Properties:
             Path: /devices/{id}
             Method: get
+            ApiId: !Ref HttpApi
         UpdateDevice:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /devices/{id}
             Method: put
         DeleteDevice:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /devices/{id}
             Method: delete
         LoadDummyData:
@@ -129,6 +288,7 @@ Resources:
           Properties:
             Path: /devices/populateDatabaseWithTestData
             Method: get
+            ApiId: !Ref HttpApi
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref DevicesTable
@@ -142,22 +302,28 @@ Resources:
           - app.ts
 
   ReportsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/reports/
-      Handler: app.lambdaHandler
-      Runtime: nodejs14.x
-      Architectures:
-        - arm64
       Events:
         CreateReport:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /reports
             Method: post
         ReadReports:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /reports
             Method: get
         ReadReport:
@@ -165,14 +331,25 @@ Resources:
           Properties:
             Path: /reports/{id}
             Method: get
+            ApiId: !Ref HttpApi
         UpdateReport:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /reports/{id}
             Method: put
         DeleteReport:
           Type: HttpApi
           Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
             Path: /reports/{id}
             Method: delete
       Policies:
@@ -188,19 +365,16 @@ Resources:
           - app.ts
 
   EmailsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/emails/
-      Handler: app.lambdaHandler
-      Runtime: nodejs16.x
-      Architectures:
-        - arm64
       Events:
         sendWelcomeEmail:
           Type: HttpApi
           Properties:
             Path: /emails/sendWelcomeEmail
             Method: post
+            ApiId: !Ref HttpApi
       Environment:
         Variables:
           sourceEmail: jman.12.93@gmail.com
@@ -216,14 +390,10 @@ Resources:
           - app.ts
 
   ProcOrdersStream:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/procOrdersDbStream/
-      Handler: app.lambdaHandler
-      Runtime: nodejs16.x
       Description: DynamoDB trigger to handle streams from order table
-      Architectures:
-        - arm64
       Events:
         DynamoDBNewOrder:
           Type: DynamoDB
@@ -373,3 +543,22 @@ Resources:
               - !Sub "arn:aws:s3:::${S3Bucket}/*"
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
+
+Outputs:
+  UserPoolId:
+    Description: "User pool ID"
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub ${AppName}:UserPoolId
+
+  UserPoolClientId:
+    Description: "Application client ID"
+    Value: !Ref UserPoolClient
+
+  AuthUrl:
+    Description: "URL used for authentication"
+    Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
+
+  ApiEndpoint:
+    Description: "HTTP API endpoint URL"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"

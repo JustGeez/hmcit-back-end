@@ -2,16 +2,6 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import AWS from 'aws-sdk';
 import { nanoid } from 'nanoid';
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
- */
-
 const ddb = new AWS.DynamoDB.DocumentClient();
 
 export const lambdaHandler = async (
@@ -58,7 +48,7 @@ export const lambdaHandler = async (
                 datePaid: '',
                 dateRefunded: '',
                 dateCompleted: '',
-                dateCreated: new Date().toLocaleDateString('en-GB', {timeZone: "UTC"})
+                dateCreated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
               },
             })
             .promise();
@@ -193,7 +183,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -222,7 +212,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -251,7 +241,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -280,7 +270,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -309,7 +299,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -338,7 +328,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -367,7 +357,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -396,7 +386,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -425,7 +415,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },
@@ -454,7 +444,7 @@ export const lambdaHandler = async (
                       datePaid: '17/02/2022',
                       dateRefunded: '',
                       dateCompleted: '',
-                      dateCreated: "15/02/2022"
+                      dateCreated: '15/02/2022',
                     },
                   },
                 },

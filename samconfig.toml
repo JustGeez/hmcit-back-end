@@ -9,3 +9,4 @@ region = "eu-west-1"
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
 confirm_changeset = true
+parameter_overrides = "AppName=\"hmctech\" ClientDomains=\"http://localhost:3000\" AdminEmail=\"jgregan93@gmail.com\" AddGroupsToScopes=\"true\" UserPoolId=\"eu-west-1_wLfnEbIdY\" Audience=\"6jgqjs8ri2iemd1q3ghemu5otv\""
