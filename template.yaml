@@ -130,6 +130,7 @@ Resources:
       CorsConfiguration:
         AllowOrigins:
           - "http://localhost:3000"
+          - "https://d1zlgl3x9ii1qx.cloudfront.net"
         AllowMethods:
           - DELETE
           - GET
