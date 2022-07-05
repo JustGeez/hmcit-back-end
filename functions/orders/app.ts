@@ -142,6 +142,24 @@ export const lambdaHandler = async (
           break;
         }
 
+        if (type === 'operatorSelect') {
+          const { operatorId } = JSON.parse(event.body);
+
+          await ddb
+            .update({
+              TableName: 'OperatorsTable',
+              Key: { id: event.pathParameters.id },
+              UpdateExpression: 'SET operator = :a',
+              ExpressionAttributeValues: {
+                ':a': `${operatorId}`,
+              },
+            })
+            .promise();
+
+          body = `PUT item ${event.pathParameters.id} allocated to operator ${operatorId}`;
+          break;
+        }
+
         break;
 
       case 'DELETE /orders/{id}':
