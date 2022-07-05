@@ -92,6 +92,14 @@ Resources:
       Precedence: 0
       UserPoolId: !Ref UserPool
 
+  OperatorUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: Operators
+      Description: Operators user group
+      Precedence: 1
+      UserPoolId: !Ref UserPool
+
   AdminUser:
     Type: AWS::Cognito::UserPoolUser
     Properties:
@@ -356,6 +364,43 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ReportsTable
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+  OperatorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/operators/
+      Events:
+        ReadOperators:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
+            Path: /operators
+            Method: get
+        ReadOperator:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: GeneralAuth
+              AuthorizationScopes:
+                - !Sub Admins-${Audience}
+            ApiId: !Ref HttpApi
+            Path: /operators
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OperatorsTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
