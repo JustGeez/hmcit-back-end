@@ -408,6 +408,7 @@ Resources:
       Environment:
         Variables:
           sourceEmail: jman.12.93@gmail.com
+          adminEmail: jgregan93@gmail.com
           websiteUrl: https://d1zlgl3x9ii1qx.cloudfront.net #TODO Change this to actual domain
       Policies:
         - AmazonSESFullAccess

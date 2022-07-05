@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "HMCTECH_DEV_CONFIRM_ORDER_ADMIN",
+    "SubjectPart": "HMCTECH: New Order {{orderId}} received!",
+    "HtmlPart": "<h1 style='color: red'>DEVELOPMENT</h1><br /><h1>Client: {{name}}</h1><p>New order: {{orderId}}</p><p>Order details go here</p><br /><h3>Best regards,</h3><h3>HMCTECH system</h3>",
+    "TextPart": "DEVELOPMENT\r\nClient {{name}},\r\nNew order: {{orderId}}\r\nOrder details go here\r\nBest regards,\r\nHMCTECH system"
+  }
+}

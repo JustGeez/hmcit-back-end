@@ -17,6 +17,7 @@ export const lambdaHandler = async (
   let lastName: string | undefined;
 
   const srcEmail = process.env.sourceEmail;
+  const adminEmail = process.env.adminEmail;
 
   // Loop through records in stream
   event.Records.forEach(async (record) => {
@@ -90,12 +91,14 @@ export const lambdaHandler = async (
         if (
           email == undefined ||
           srcEmail == undefined ||
+          adminEmail == undefined ||
           firstName == undefined ||
           lastName == undefined ||
           orderId == undefined
         ) {
           if (email == undefined) console.error('MODIFY: Email var undefined');
           if (srcEmail == undefined) console.error('MODIFY: srcEmail var undefined');
+          if (adminEmail == undefined) console.error('MODIFY: adminEmail var undefined');
           if (firstName == undefined) console.error('MODIFY: firstName var undefined');
           if (lastName == undefined) console.error('MODIFY: lastName var undefined');
           if (orderId == undefined) console.error('MODIFY: orderId var undefined');
@@ -113,6 +116,7 @@ export const lambdaHandler = async (
         if (newDatePaid !== oldDatePaid) {
           // const invoiceUrl = `${process.env.websiteUrl}/invoices/${orderId}`;
 
+          // SEND INVOICE TO CLIENT
           params = {
             Source: srcEmail,
             Destination: {
@@ -132,6 +136,28 @@ export const lambdaHandler = async (
             console.log('SUCCESS: payment status', data);
           } catch (error) {
             console.error('ERROR: payment status', error);
+          }
+
+          // SEND NOTIFICATION OF ORDER TO ADMIN
+          params = {
+            Source: srcEmail,
+            Destination: {
+              ToAddresses: [adminEmail],
+            },
+            ReplyToAddresses: [srcEmail],
+            Template: 'HMCTECH_DEV_CONFIRM_ORDER_ADMIN',
+            TemplateData: JSON.stringify({
+              name: `${firstName} ${lastName}`,
+              orderId: orderId,
+              // invoiceUrl: invoiceUrl,
+            }),
+          };
+
+          try {
+            const data = await sesClient.send(new SendTemplatedEmailCommand(params));
+            console.log('SUCCESS: Confirm order with admin', data);
+          } catch (error) {
+            console.error('ERROR: Confirm order with admin', error);
           }
         }
 
