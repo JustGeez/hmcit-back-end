@@ -198,6 +198,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             Path: /orders
             Method: get
             ApiId: !Ref HttpApi
@@ -253,6 +254,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /devices
             Method: post
@@ -263,6 +265,7 @@ Resources:
             #   Authorizer: GeneralAuth
             #   AuthorizationScopes:
             #     - !Sub Admins-${Audience}
+            #     - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /devices
             Method: get
@@ -279,6 +282,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /devices/{id}
             Method: put
@@ -322,6 +326,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /reports
             Method: post
@@ -332,6 +337,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /reports
             Method: get
@@ -348,6 +354,7 @@ Resources:
               Authorizer: GeneralAuth
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
+                - !Sub Operators-${Audience}
             ApiId: !Ref HttpApi
             Path: /reports/{id}
             Method: put
@@ -396,7 +403,7 @@ Resources:
               AuthorizationScopes:
                 - !Sub Admins-${Audience}
             ApiId: !Ref HttpApi
-            Path: /operators
+            Path: /operators/{id}
             Method: get
       Policies:
         - DynamoDBCrudPolicy:
