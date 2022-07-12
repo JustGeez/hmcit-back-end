@@ -18,7 +18,7 @@ export const lambdaHandler = async (
         if (event.body) {
           console.log(...event.body);
 
-          const { firstName, lastName, email, answers } = JSON.parse(event.body);
+          const { firstName, lastName, email, answers, operatorId } = JSON.parse(event.body);
 
           const id = nanoid();
 
@@ -49,6 +49,7 @@ export const lambdaHandler = async (
                 dateRefunded: '',
                 dateCompleted: '',
                 dateCreated: new Date().toLocaleDateString('en-GB', { timeZone: 'UTC' }),
+                operatorId: operatorId,
               },
             })
             .promise();
@@ -95,6 +96,25 @@ export const lambdaHandler = async (
             .promise();
 
           body = `PUT item ${event.pathParameters.id} payment status updated`;
+          break;
+        }
+
+        // HANDLE OPERATOR UPDATE
+        if (type == 'operator') {
+          const { operatorId } = JSON.parse(event.body);
+
+          await ddb
+            .update({
+              TableName: 'OrdersTable',
+              Key: { id: event.pathParameters.id },
+              UpdateExpression: 'SET operatorId = :a',
+              ExpressionAttributeValues: {
+                ':a': `${operatorId}`,
+              },
+            })
+            .promise();
+
+          body = `PUT item ${event.pathParameters.id} allocated to operator ${operatorId}`;
           break;
         }
 
