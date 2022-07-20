@@ -97,7 +97,7 @@ export const lambdaHandler = async (
                         'https://www.incredible.co.za/hp-spectre-x360-14-core-i7-1165g7-16gb-ram-1tb-ssd-storage-2-in-1-laptop',
                       techSpecs: {
                         os: 'windows',
-                        screenSize: '14inch',
+                        screen: '14inch',
                         touchScreen: 'no',
                         processor: 'Core i7 1165G7',
                         graphics: 'Intel Iris Xe',
@@ -129,7 +129,7 @@ export const lambdaHandler = async (
                         'https://www.incredible.co.za/dell-xps-7390-i7-1051u-16-512-fhd-laptop',
                       techSpecs: {
                         os: 'windows',
-                        screenSize: '13.3inch',
+                        screen: '13.3inch',
                         touchScreen: 'yes',
                         processor: 'Core i7 10510U',
                         graphics: 'Intel Iris Xe',
@@ -161,7 +161,7 @@ export const lambdaHandler = async (
                         'https://www.incredible.co.za/acer-nitro-5-ryzen-7-5800h-16gb-ram-1tb-ssd-geforce-rtx-3060-gaming-laptop',
                       techSpecs: {
                         os: 'windows',
-                        screenSize: '15inch',
+                        screen: '15inch',
                         touchScreen: 'no',
                         processor: 'Ryzen 7 5800H',
                         graphics: 'RTX3060 6Gb',
@@ -193,7 +193,7 @@ export const lambdaHandler = async (
                         'https://www.incredible.co.za/hp-omen-ryzen-7-5800h-16gb-ram-1tb-ssd-storage-rtx-3070-gaming-laptop',
                       techSpecs: {
                         os: 'windows',
-                        screenSize: '16inch', //TODO: Add refresh rate spec
+                        screen: '16inch', //TODO: Add refresh rate spec
                         touchScreen: 'no',
                         processor: 'Ryzen 7 5800H',
                         graphics: 'RTX3070 8Gb',
@@ -225,7 +225,7 @@ export const lambdaHandler = async (
                         'https://www.incredible.co.za/apple-macbook-pro-13-inch-m1-chip-8-core-gpu-16gb-512gb-ssd-space-grey',
                       techSpecs: {
                         os: 'MacOS',
-                        screenSize: '13.3Inch',
+                        screen: '13.3Inch',
                         touchScreen: 'no',
                         processor: 'Apple M1',
                         graphics: 'M1 8-core GPU',
